@@ -7,4 +7,4 @@ script:
   - cd ./src
   - pytest
 after_success:
- - python container_challenge.py
+ - python orchestrate.py
