@@ -1,7 +1,0 @@
-/angles_Basic_degrees.csv
-/angles_Basic_radians.csv
-/angles_Basic_final.csv
-chdavid/moshpyt:20190129
-chdavid/moshpyt:20190129
-/home/moshpyt/src/msh_ang_deg_rad.py
-/home/moshpyt/src/msh_ang_rad_deg.py
