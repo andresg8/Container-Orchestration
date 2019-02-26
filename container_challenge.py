@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+# Author: Andy Gonzalez
 import docker
 import csv
 import os
+import math
 
 
 # parse_namelist generates a dictionary representation of the namelist
@@ -44,7 +46,7 @@ def run_containers(DClient, namelist: {}):
 
 	# container commands need to be formed using the namelist definitions 
 	# and with the temp destination in mind.
-	cmd1 = namelist["cmd1"] + " " + shareDir + namelist["in_file"] + " " + shareDir +namelist["mid_file"]
+	cmd1 = namelist["cmd1"] + " " + shareDir + namelist["in_file"] + " " + shareDir +namelist["med_file"]
 	cmd2 = namelist["cmd2"] + " " + shareDir + namelist["med_file"] + " " + shareDir + namelist["out_file"]
 
 	# cont1 runs cmd1 on the input file to produce an intermediate file
@@ -52,15 +54,22 @@ def run_containers(DClient, namelist: {}):
 	DClient.containers.run(namelist["cont1"], cmd1, volumes = vol, stdin_open = True, remove = True)
 	DClient.containers.run(namelist["cont2"], cmd2, volumes = vol, stdin_open = True, remove = True)
 
+def print_data(data: ".csv"):
+	with  open(data, "r") as csvfile:
+		reader = csv.reader(csvfile)
+		for row in reader:
+			print(",".join(row))
+
 
 if __name__ == "__main__":
 	# Currently hardcoded, this could easily be turned into an command
 	# line input via sys.argv
 	namelistfile = "namelist.txt"
 
-	
 	namelist = parse_namelist(namelistfile)
 
 	client = docker.from_env()
 
 	run_containers(client, namelist)
+
+	print_data("angles_Basic_final.csv")
