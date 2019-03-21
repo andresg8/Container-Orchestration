@@ -9,11 +9,8 @@ matrix:
       language: generic
       env: PYTHONPATH=/usr/local/lib/python3.7
 
-before_install: |
-  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    brew install python;
-  fi
-  #pip install --user --upgrade pip 
+before_install: 
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python; fi
 #language: python
 #python:
   #- "3.6"
