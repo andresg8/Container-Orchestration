@@ -18,6 +18,6 @@ install:
   - pip3 install -r requirements.txt
 script:
   - cd ./src
-  - python3 pytest
-after_success:
- - python3 orchestrate.py
+  - python3 orchestrate.py
+#after_success:
+# - python3 orchestrate.py
