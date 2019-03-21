@@ -1,21 +1,11 @@
-matrix:
-  include:
-    - os: linux
-      language: python
-      python:
-        - "3.6.3"
-      sudo: required
-    - os: osx
-      language: generic
-      sudo: required
 
-before_install: 
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Docker; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then open Docker.app; fi
-
+language: python
+python:
+  - "3.6"
 install: 
-  - pip3 install -r requirements.txt
-
+  - pip install -r requirements.txt
 script:
   - cd ./src
-  - python3 orchestrate.py
+  - pytest
+after_success:
+ - python orchestrate.py
