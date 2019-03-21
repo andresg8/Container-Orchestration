@@ -18,7 +18,10 @@ def parse_namelist(filename: "*.txt") -> {"label" : "content"}:
 				if line.strip() and line[0] != "!":
 					line = line.strip().split("=")
 					label, content = line[0], line[1]
-					namelist[label] = content
+					if "file" in label:
+						namelist[label] = content[1:]
+					else:
+						namelist[label] = content
 					if "cmd" in label:
 						cmdCount += 1
 			namelist["cmdCount"] = cmdCount
