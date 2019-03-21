@@ -1,1 +1,2 @@
-docker
+pip==19.0.1
+docker-py==1.10.6
