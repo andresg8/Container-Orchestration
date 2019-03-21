@@ -6,13 +6,15 @@ matrix:
         - "3.6.3"
       sudo: required
     - os: osx
-      language: generic
-      #env: PYTHON=3.6.3
+      language: python
+      python:
+        - "3.6.5_1"
+      env: PYTHONPATH=/usr/local/lib/python3.6
 
-before_install: |
-  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    brew install python;
-  fi
+#before_install: |
+#  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+#    brew install python;
+#  fi
   #pip install --user --upgrade pip 
 #language: python
 #python:
