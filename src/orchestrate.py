@@ -4,11 +4,8 @@ import docker
 import csv
 import os
 
-# parse_namelist generates a dictionary representation of the namelist
-# text file. Every key is the label or name for the corresponding content.
-# Both label and content are directly derived from the conventions used 
-# in the namelist. Then, to facilitate orchestrating many containers at 
-# once, the number of commands to be executed is recorded into the dict. 
+# filename is expected to be a txt file that follows the 
+# namelist conventions. 
 def parse_namelist(filename: "*.txt") -> {"label" : "content"}:
 	namelist = dict()
 	cmdCount = 0
@@ -32,38 +29,23 @@ def parse_namelist(filename: "*.txt") -> {"label" : "content"}:
 		raise SystemExit(22)
 
 
-# Using an already initialized DockerClient and the organized namelist
-# dict, run_containers handles the orchestration of sharing data across
-# a number of containers equal to the number of commands defined by the
-# namelist. This script's working directory serves as the intermediate 
-# space where the containers share data. This was done to provide access
-# to the intial .csv file and so that the resulting files stick around
-# in an easy to access manner (on the host machine). 
+# Uses an already initialized DockerClient to execute the commands
+# defined by the namelist. All containers are flagged as removable 
+# upon completion so they're cleaned up by the DockerClient automatically
 def run_containers(DClient, namelist: {"label" : "content"}):
-	# sharedDir acts as the temporary destination end in the volume where
-	# containers can read from / write to and access the local shared dir.
+	# Setup for shared local directory that can be passed as a volume 
+	# to each container run
 	shareDir = "/home/vol"
 	settings = {"bind": shareDir, "mode": "rw"}
 	vol = {os.getcwd(): settings}
 
-	containers = []
+	# Starts and runs each container as defined by the namelist
 	for cmdNum in range(1, namelist["cmdCount"] + 1):
-		# container commands need to be formed using the namelist definitions 
-		# and with the temp destination in mind.
 		cmd = (namelist["cmd" + str(cmdNum)] + " " +
 						shareDir + namelist["file" + str(cmdNum)] +
 						" " + shareDir +namelist["file" + str(cmdNum + 1)])
-		# containers are run in the background so that DClient doesn't try 
-		# cleaning volume references once a container falls out of scope.
-		# This would happen if "remove" was set to True and a list wasn't
-		# used to maintain a reference to each container.  
-		containers.append(DClient.containers.run(namelist["img" + str(cmdNum)], cmd, 
-								volumes = vol, stdin_open = True, detach = True))
-	# closing containers
-	for container in containers:
-		container.wait()
-		container.stop()
-		container.remove()
+		DClient.containers.run(namelist["img" + str(cmdNum)], cmd, 
+					volumes = vol, stdin_open = True, detach = True)
 
 
 # Given a .csv file, print_data prints the raw content of the file
@@ -80,18 +62,12 @@ def print_data(data: ".csv"):
 
 
 if __name__ == "__main__":
-	# Currently hardcoded, this could easily be turned into an command
-	# line input via sys.argv
+	client = docker.from_env()
+	
 	print("Running with the provided namelist.txt:")
 	namelistfile = "namelist.txt"
-
 	namelist = parse_namelist(namelistfile)
-
-	client = docker.from_env()
-
 	run_containers(client, namelist)
-
-	# Visual confirmation the script was successful on Travis CI. 
 	print_data("angles_Basic_final.csv")
 	
 	print("Running with namelistMC.txt to demonstrate multiple containers/commands in one run:")
