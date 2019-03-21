@@ -7,10 +7,11 @@ matrix:
       sudo: required
     - os: osx
       language: generic
+      sudo: required
       #env: PYTHONPATH=/usr/local/lib/python3.6
 
-#before_install: 
-#- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then open --background -a Docker; fi
+before_install: 
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Docker; fi
 #language: python
 #python:
   #- "3.6"
