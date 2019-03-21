@@ -6,7 +6,7 @@ matrix:
         - "3.6.3"
       sudo: required
     - os: osx
-      language: python
+      language: generic
       env: PYTHONPATH=/usr/local/lib/python3.7
 
 before_install: |
