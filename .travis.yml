@@ -7,7 +7,7 @@ matrix:
       sudo: required
     - os: osx
       language: generic
-      env: PYTHONPATH=/usr/local/lib/python3.6.5_1
+      env: PYTHONPATH=/usr/local/lib/python3.6
 
 #before_install: 
 #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python; fi
