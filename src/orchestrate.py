@@ -3,26 +3,25 @@
 import docker
 import csv
 import os
-import math
-
 
 # parse_namelist generates a dictionary representation of the namelist
-# text file. Every key is a str that labels the value which is the str 
-# content of the .txt line by line. I don't like how hardcoded it 
-# looks/is but I think this was inevitable given the defined nature of
-# the problem. 
+# text file. Every key is the label or name for the corresponding content.
+# Both label and content are directly derived from the conventions used 
+# in the namelist. Then, to facilitate orchestrating many containers at 
+# once, the number of commands to be executed is recorded into the dict. 
 def parse_namelist(filename: "*.txt") -> {"label" : "content"}:
+	namelist = dict()
+	cmdCount = 0
 	try:
 		with open(filename) as file:
-			lines = file.readlines()
-			namelist = dict()
-			namelist["in_file"] = lines[0].strip('\n')
-			namelist["med_file"] = lines[1].strip('\n')
-			namelist["out_file"] = lines[2].strip('\n')
-			namelist["cont1"] = lines[3].strip('\n')
-			namelist["cont2"] = lines[4].strip('\n')
-			namelist["cmd1"] = lines[5].strip('\n')
-			namelist["cmd2"] = lines[6].strip('\n')
+			for line in file:
+				if line.strip() and line[0] != "!":
+					line = line.strip().split("=")
+					label, content = line[0], line[1]
+					namelist[label] = content
+					if "cmd" in label:
+						cmdCount += 1
+			namelist["cmdCount"] = cmdCount
 			return namelist
 
 	except IOError as e:
@@ -30,35 +29,51 @@ def parse_namelist(filename: "*.txt") -> {"label" : "content"}:
 		raise SystemExit(22)
 
 
-# Using the already initialized DockerClient and the organized namelist
+# Using an already initialized DockerClient and the organized namelist
 # dict, run_containers handles the orchestration of sharing data across
-# two containers so that commands dependent on the data can be run on 
-# either container sequentially. This script's working directory serves as 
-# the intermediate space where the containers share data. This was done to
-# provide access to the intial .csv file and so that the resulting files
-# stick around in an easily accessible manner (on the host machine). 
-def run_containers(DClient, namelist: {}):
-	# sharedDir acts as the temporary destination end to the volume where
+# a number of containers equal to the number of commands defined by the
+# namelist. This script's working directory serves as the intermediate 
+# space where the containers share data. This was done to provide access
+# to the intial .csv file and so that the resulting files stick around
+# in an easy to access manner (on the host machine). 
+def run_containers(DClient, namelist: {"label" : "content"}):
+	# sharedDir acts as the temporary destination end in the volume where
 	# containers can read from / write to and access the local shared dir.
 	shareDir = "/home/vol"
 	settings = {"bind": shareDir, "mode": "rw"}
 	vol = {os.getcwd(): settings}
 
-	# container commands need to be formed using the namelist definitions 
-	# and with the temp destination in mind.
-	cmd1 = namelist["cmd1"] + " " + shareDir + namelist["in_file"] + " " + shareDir +namelist["med_file"]
-	cmd2 = namelist["cmd2"] + " " + shareDir + namelist["med_file"] + " " + shareDir + namelist["out_file"]
+	containers = []
+	for cmdNum in range(1, namelist["cmdCount"] + 1):
+		# container commands need to be formed using the namelist definitions 
+		# and with the temp destination in mind.
+		cmd = (namelist["cmd" + str(cmdNum)] + " " +
+						shareDir + namelist["file" + str(cmdNum)] +
+						" " + shareDir +namelist["file" + str(cmdNum)])
+		# containers are run in the background so that DClient doesn't try 
+		# cleaning volume references once a container falls out of scope.
+		# This would happen if "remove" was set to True and a list wasn't
+		# used to maintain a reference to each container.  
+		containers.append(DClient.containers.run(namelist["img" + str(cmdNum)], cmd, 
+								volumes = vol, stdin_open = True, detach = True))
+	# closing containers
+	for container in containers:
+		container.wait()
+		container.stop()
+		container.remove()
 
-	# cont1 runs cmd1 on the input file to produce an intermediate file
-	# cont2 runs cmd2 on the intermediate file to produce the output file
-	DClient.containers.run(namelist["cont1"], cmd1, volumes = vol, stdin_open = True, remove = True)
-	DClient.containers.run(namelist["cont2"], cmd2, volumes = vol, stdin_open = True, remove = True)
 
+# Given a .csv file, print_data prints the raw content of the file
 def print_data(data: ".csv"):
-	with  open(data, "r") as csvfile:
-		reader = csv.reader(csvfile)
-		for row in reader:
-			print(",".join(row))
+	try:
+		with  open(data, "r") as csvfile:
+			reader = csv.reader(csvfile)
+			for row in reader:
+				print(",".join(row))
+
+	except IOError as e:
+		print("Unable to find/open file: " + data)
+		raise SystemExit(22)			
 
 
 if __name__ == "__main__":
@@ -72,4 +87,5 @@ if __name__ == "__main__":
 
 	run_containers(client, namelist)
 
+	# Visual confirmation the script was successful on Travis CI. 
 	print_data("angles_Basic_final.csv")
