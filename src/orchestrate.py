@@ -79,6 +79,7 @@ def print_data(data: ".csv"):
 if __name__ == "__main__":
 	# Currently hardcoded, this could easily be turned into an command
 	# line input via sys.argv
+	print("Running with the provided namelist.txt:")
 	namelistfile = "namelist.txt"
 
 	namelist = parse_namelist(namelistfile)
@@ -88,4 +89,10 @@ if __name__ == "__main__":
 	run_containers(client, namelist)
 
 	# Visual confirmation the script was successful on Travis CI. 
+	print_data("angles_Basic_final.csv")
+	
+	print("Running with namelistMC.txt to demonstrate multiple containers/commands in one run:")
+	namelistfile = "namelistMC.txt"
+	namelist = parse_namelist(namelistfile)
+	run_containers(client, namelist)
 	print_data("angles_Basic_final.csv")
