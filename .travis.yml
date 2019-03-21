@@ -7,6 +7,7 @@ matrix:
       sudo: required
     - os: osx
       language: generic
+      sudo: required
       #env: PYTHONPATH=/usr/local/lib/python3.6
 
 #before_install: 
