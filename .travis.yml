@@ -2,11 +2,11 @@ matrix:
   include:
     - os: linux
       language: python
+      python: 3.6
       sudo: required
     - os: osx
       language: python
-    - os: windows
-      language: python
+      python: 3.6
 
 before_install:
 #-------------------------------------------------------------------------------
@@ -22,14 +22,6 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew --version                  ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew reinstall $(grep -v -E '(^#|^$)' requirements.brw) ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew list                       ; fi
-
-#-------------------------------------------------------------------------------
-#Specific to Windows
-#-------------------------------------------------------------------------------
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco info choco            ; fi
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then powershell "choco install --no-progress ((gc requirements.cho) -notmatch '^#' -match '\S')" ; fi
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then export PATH="C:\\Python27\\:C:\\Python27\\Scripts\\:$PATH" ; fi
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco list --local-only     ; fi
 
 #-------------------------------------------------------------------------------
 #Checking environment details (OS-agnostic)
