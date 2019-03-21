@@ -49,7 +49,7 @@ def run_containers(DClient, namelist: {"label" : "content"}):
 		# and with the temp destination in mind.
 		cmd = (namelist["cmd" + str(cmdNum)] + " " +
 						shareDir + namelist["file" + str(cmdNum)] +
-						" " + shareDir +namelist["file" + str(cmdNum)])
+						" " + shareDir +namelist["file" + str(cmdNum + 1)])
 		# containers are run in the background so that DClient doesn't try 
 		# cleaning volume references once a container falls out of scope.
 		# This would happen if "remove" was set to True and a list wasn't
