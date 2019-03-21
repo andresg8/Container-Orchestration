@@ -44,8 +44,9 @@ def run_containers(DClient, namelist: {"label" : "content"}):
 		cmd = (namelist["cmd" + str(cmdNum)] + " " +
 						shareDir + namelist["file" + str(cmdNum)] +
 						" " + shareDir +namelist["file" + str(cmdNum + 1)])
+
 		DClient.containers.run(namelist["img" + str(cmdNum)], cmd, 
-					volumes = vol, stdin_open = True, detach = True)
+								volumes = vol, stdin_open = True, remove = True)
 
 
 # Given a .csv file, print_data prints the raw content of the file
