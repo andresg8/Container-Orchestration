@@ -1,7 +1,9 @@
 matrix:
   include:
     - os: linux
-      language: python3.6.3
+      language: python
+      python:
+        - "3.6.3"
       sudo: required
     - os: osx
       language: python3.6.3
