@@ -8,18 +8,14 @@ matrix:
     - os: osx
       language: generic
       sudo: required
-      #env: PYTHONPATH=/usr/local/lib/python3.6
 
 before_install: 
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install Docker; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then open /Applications/Docker.app; fi
-#language: python
-#python:
-  #- "3.6"
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then open Docker.app; fi
+
 install: 
   - pip3 install -r requirements.txt
+
 script:
   - cd ./src
   - python3 orchestrate.py
-#after_success:
-# - python3 orchestrate.py
