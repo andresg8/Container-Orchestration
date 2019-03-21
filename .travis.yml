@@ -15,10 +15,9 @@ matrix:
 #python:
   #- "3.6"
 install: 
-  - pip install -r requirements.txt
+  - pip3 install -r requirements.txt
 script:
   - cd ./src
-  - python3 orchestrate.py
-#  - pytest
-#after_success:
-# - python3 orchestrate.py
+  - python3 pytest
+after_success:
+ - python3 orchestrate.py
