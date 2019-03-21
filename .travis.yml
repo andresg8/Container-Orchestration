@@ -11,7 +11,7 @@ matrix:
 
 before_install: |
   if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    brew upgrade python;
+    brew install python;
   fi
   #pip install --user --upgrade pip 
 #language: python
