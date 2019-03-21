@@ -12,7 +12,6 @@ matrix:
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     brew upgrade python;
   fi
-  #pip install --upgrade pip 
 
 #language: python
 #python:
